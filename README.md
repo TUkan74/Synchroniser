@@ -1,2 +1,2 @@
 # Synchronizer
-Python synchronizer, which synchronizes two folders
+Python synchroniser, which synchronises two folders
