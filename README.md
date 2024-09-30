@@ -28,6 +28,8 @@ To start the program, simply run:
 python sync_folders.py /path/to/source /path/to/replica 30 /path/to/logfile.log
 ```
 
+This will synchronize the folders every 30 seconds and log operations to logfile.log.
+
 ## Testing
 
 For testing the script, you can add,edit or delete tests in the script:
