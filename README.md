@@ -25,7 +25,7 @@ python install-deperndencies.py
 To start the program, simply run: 
 
 ```
-python sync_folders.py /path/to/source /path/to/replica 30 /path/to/logfile.log
+python sync_folders.py /path/to/source /path/to/replica /path/to/logfile.log 30
 ```
 
 This will synchronize the folders every 30 seconds and log operations to logfile.log.
