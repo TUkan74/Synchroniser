@@ -1,17 +1,16 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Dict
 import hashlib
-from logger import setup_logger
+import time
+import argparse
+from sync_logger import setup_logger
 
 class Syncer:
     def __init__(self, source: str, replica: str, log_file: str = None):
         self.source = Path(source)
         self.replica = Path(replica)
         self.logger = setup_logger(log_file)
-
-
 
     def calculate_md5(self, file_path: Path) -> str:
         """Calculate MD5 checksum of a file."""
@@ -21,7 +20,7 @@ class Syncer:
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
 
-    def travers_get_modification_times(self, folder: Path) -> Dict[Path, float]:
+    def travers_get_modification_times(self, folder: Path):
         """Traverse a folder and return a dictionary with file paths and their modification times."""
         modification_times = {}
         for file in folder.rglob("*"):
@@ -31,6 +30,9 @@ class Syncer:
 
     def sync_folders(self):
         """Synchronize source folder with replica folder."""
+        start_time = time.time()  # Track start time
+        self.logger.info("Starting synchronization...")
+
         # Sync files from source to replica
         for src_file in self.source.rglob("*"):
             replica_file = self.replica / src_file.relative_to(self.source)
@@ -54,3 +56,27 @@ class Syncer:
                     shutil.rmtree(replica_file)
                     self.logger.info(f"Deleted directory: {replica_file}")
 
+        # Calculate elapsed time
+        elapsed_time = time.time() - start_time
+        self.logger.info(f"Synchronization completed in {elapsed_time:.2f} seconds.")
+
+# The main method to accept command-line arguments
+def main():
+    parser = argparse.ArgumentParser(description="Folder Synchronizer")
+    parser.add_argument("src_dir", type=str, help="Path to the source directory")
+    parser.add_argument("replica_dir", type=str, help="Path to the replica directory")
+    parser.add_argument("log_file", type=str, help="Path to the log file")
+    parser.add_argument("interval", type=int, help="Synchronization interval in seconds")
+
+    args = parser.parse_args()
+
+    # Initialize Syncer with the source, replica, and log file
+    syncer = Syncer(args.src_dir, args.replica_dir, args.log_file)
+
+    # Run synchronization periodically based on the specified interval
+    while True:
+        syncer.sync_folders()
+        time.sleep(args.interval)
+
+if __name__ == "__main__":
+    main()
